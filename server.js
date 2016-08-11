@@ -13,6 +13,7 @@ var slapp = Slapp({
 var app = slapp.attachToExpress(express());
 
 slapp.message('hi (.*)', ['direct_message'], (msg, text, match1) => {
+  console.log('received message' + msg)
   msg.say('How are you?').route('handleHi', { what: match1 })
 });
 
