@@ -5,21 +5,12 @@
   "description": "A slack bot that integrates with Done Done",
   "repository": "https://github.com/samfeder/done-done-bot",
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-eslint": "^6.0.4",
-    "babel-preset-es2015": "^6.9.0",
-    "eslint": "2.10.2",
-    "eslint-config-angular": "^0.5.0",
-    "eslint-plugin-angular": "^1.0.1",
-    "gulp": "~3.9.1",
-    "supervisor": "^0.10.0"
+    "express": "^4.14.0",
+    "slapp": "^1.0.1",
+    "slapp-context-beepboop": "^1.0.0",
+    "slapp-convo-beepboop": "^1.0.0"
   },
   "dependencies": {
     "slapp": "^1.0.2"
-  },
-  "scripts": {
-    "build": "gulp",
-    "start-dev": "npm install && npm run build && supervisor ./bin/www",
-    "start": "node ./bin/www"
   }
 }
