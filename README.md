@@ -25,5 +25,5 @@ Forwarding                    http://163efa86.ngrok.io -> localhost:4000
 Forwarding                    https://163efa86.ngrok.io -> localhost:4000
 ```
 That last https url (https://163efa86.ngrok.io in this case. Yours may be different) is going to be your `Override URL`
-3. 2. Follow [this link](https://beepboophq.com/0_o/my-projects/3ccc8e6fd96444f9bad93b11ccbd4e06/teams#) to your projects and find done-done bot. Select `Enable Testing` and enter your `Override URL`.
-4. Start up the app `POST=4000 npm start`. You should see all incoming traffic logged through ngrok.
+3. Follow [this link](https://beepboophq.com/0_o/my-projects/3ccc8e6fd96444f9bad93b11ccbd4e06/teams#) to your projects and find done-done bot. Select `Enable Testing` and enter your `Override URL`.
+4. Start up the app `PORT=4000 npm start`. You should see all incoming traffic logged through ngrok.

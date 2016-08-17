@@ -5,15 +5,16 @@ const BeepBoopConvoStore = require('slapp-convo-beepboop');
 const BeepBoopContext = require('slapp-context-beepboop');
 if (!process.env.PORT) throw Error('PORT missing but required');
 
-var slapp = Slapp({
+let slapp = Slapp({
   convo_store: BeepBoopConvoStore(),
   context: BeepBoopContext()
 });
 
+require('./flows')(slapp);
 var app = slapp.attachToExpress(express());
 
-slapp.message('hi (.*)', ['direct_message'], (msg, text, match1) => {
-  console.log('received message' + msg)
+slapp.message('deh (.*)', ['direct_message'], (msg, text, match1) => {
+  console.log('received message' + msg);
   msg.say('How are you?').route('handleHi', { what: match1 })
 });
 
