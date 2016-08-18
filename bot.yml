@@ -2,8 +2,13 @@ name: rosie
 description: bot that leverages donedone to keep track of bugs so you can fix them
 avatar: rosie.png
 config:
-- name: DONE_DONE
+- name: DONE_DONE_KEY
   friendly_name: Done Done API Token
   info: API Token to authenticate a Done Done user
   type: secret
+  global: true
+- name: DONE_DONE_USERNAME
+  friendly_name: Done Done Username
+  info: Done Done Username Associated to Rosie
+  type: text
   global: true

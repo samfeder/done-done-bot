@@ -1,5 +1,7 @@
 'use strict';
 const _ = require('lodash');
+const DONE_DONE_KEY = process.env.DONE_DONE_KEY;
+const DONE_DONE_USERNAME = process.env.DONE_DONE_USERNAME;
 
 const descriptionOptions = [{
   text: '',
