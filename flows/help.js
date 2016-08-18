@@ -8,8 +8,18 @@ module.exports = (slapp) => {
   \`\`\`
   Follow the prompts and feel free to ping @samfeder or #contentops for questions about how I work.`;
 
-  slapp.message('helpMessage', ['direct_message'], (msg, text) => {
-    msg.say(helpMessage)
+  function channelMessage(channelName) {
+    return `Hey there ${channelName}! I'm Rosie! 
+    
+    I'm here to make reporting content-related issues super easy! Whether a video isn't playing, subtitles are missing, you find a typo somewhere... Anything, please let me know about it and contentops will fix it up in a jiffy!
+    
+    If you want to report something, just open a direct message conversation with me and tell me your issue.
+    `;
+  }
+
+
+  slapp.command('/donedonehelp', (msg, text) => {
+    msg.respond(msg.body.channel_name == 'directmessage' ? helpMessage : channelMessage(msg.body.channel_name));
   });
 
   slapp.event('bb.team_added', function(msg) {
