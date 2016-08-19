@@ -12,7 +12,7 @@ let slapp = Slapp({
   context: BeepBoopContext()
 });
 
-require('./flows')(slapp, script);
+require('./flows')(slapp);
 let app = slapp.attachToExpress(express());
 
 app.get('/', function (req, res) {

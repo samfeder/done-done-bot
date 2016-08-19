@@ -25,7 +25,7 @@ const submittalOptions = [{
   ]
 }];
 
-module.exports = (slapp, script) => {
+module.exports = slapp => {
   slapp.message('(.*)', ['direct_message'], (msg, text) => {
     if (msg.type === 'file_share') return; //only respond to text
 
@@ -44,11 +44,11 @@ module.exports = (slapp, script) => {
           name: currentUser.real_name //we'll append the reporters name in there later
         };
 
-        msg.say('Well this is awkward :frown:... I can\'t find your done done account to CC you on this issue. We use the full names you signed up with on Slack and Done Done to match you! So please make sure those are identical :key:! That or go bother Sam F :smiley:')
+        msg.say(donedone.script.unlinkedAcocunt)
       }
       
       msg.say({
-        text: `Issue: \`${text}\`\n${script.initialReaction}`,
+        text: `Issue: \`${text}\`\n${donedone.script.initialReaction}`,
         attachments: [{
           text: '',
           callback_id: 'report_issue_callback',
@@ -59,53 +59,48 @@ module.exports = (slapp, script) => {
             { name: 'answer', text: 'Cancel / Start Over', type: 'button', value: 'cancel' }
           ]
         }]
-      }).route('handleIssue', { title: text, user: doneDoneUser });
+      }).route('createMinimumTicket', { title: text, user: doneDoneUser });
     });
   });
 
-  slapp.route('handleIssue', (msg, state) => {
+  slapp.route('createMinimumTicket', (msg, state) => {
     let issue = state;
 
     if (msg.type !== 'action') {
-      msg.say(script.invalidResponse)
-        .route('handleIssue', state, 30);
+      msg.say(donedone.script.invalidResponse)
+        .route('createMinimumTicket', state, 30);
     }
 
+    deleteExpiredButtons(msg);
+
     let answer = msg.body.actions[0].value;
+
     if (answer === 'cancel') {
-      msg.respond(msg.body.response_url, {
-        text: script.cancelText,
-        delete_original: true
-      });
-      // notice we did NOT specify a route because the conversation is over
+      msg.say(donedone.script.cancelText);
       return;
     }
 
     issue.site = answer;
 
     msg.say({
-      text: `${script.siteProvided(issue.site)} \n\n*Upload a jpg or png file to include it as a screenshot (hint: you can upload multiple if you\'d like)*`,
-      attachments: descriptionOptions
+      text: `${donedone.script.siteProvided(issue.site)} \n\n*If you'd like, upload a jpg or png file to include it as a screenshot (hint: you can upload multiple)*`
+      //attachments: descriptionOptions
     }).route('improveDescription', { issue: issue });
   });
 
   slapp.route('improveDescription', (msg, state) => {
     let response;
 
-    if (msg.type === 'action') {
-      let answer = msg.body.actions[0].value;
-      if (answer === 'cancel') {
-        response = script.cancelText;
+    deleteExpiredButtons(msg);
 
-        msg.respond(msg.body.response_url, {
-          text: response,
-          delete_original: true
-        });
-        return;
-      }
+    if (msg.type === 'action') {
+
+      let answer = msg.body.actions[0].value;
+
       if (answer === 'continue') {
+
         if (state.issue.description || state.issue.screenshots && state.issue.screenshots.length > 0) {
-          let response = script.finalReview;
+          let response = donedone.script.finalReview;
           let title = `(${state.issue.site}) ${state.issue.title}`;
           state.issue.screenshotText = state.issue.screenshots && state.issue.screenshots.join('\n');
           let description = state.issue.screenshotText
@@ -119,7 +114,7 @@ module.exports = (slapp, script) => {
             attachments: submittalOptions
           }).route('submitIssue', { issue: state.issue });
         } else {
-          msg.say(script.invalidSubmission)
+          msg.say(donedone.script.invalidSubmission)
             .route('improveDescription', { issue: state.issue });
         }
 
@@ -132,25 +127,27 @@ module.exports = (slapp, script) => {
 
       if (validScreenshot) {
         state.issue.screenshots = state.issue.screenshots.concat(msg.body.event.file.permalink);
-        response = script.happyScreenshotResponse;
+        response = donedone.script.happyScreenshotResponse;
       } else {
-        response = script.sadScreenshotResponse;
+        response = donedone.script.sadScreenshotResponse;
       }
-
       msg.say({
         text: `${response}\n\nScreenshots added: ${state.issue.screenshots.length}\n\nYou can enter text to update the full description, upload a file to add another screenshot, or keep it movin\'`,
         attachments: descriptionOptions
       }).route('improveDescription', { issue: state.issue });
     } else {
       state.issue.description = msg.body.event.text;
-      response = script.descriptionAdded;
+      response = donedone.script.descriptionAdded;
 
       msg.say({
         text: `Description: \`${state.issue.description}\`\n\n${response}\nEntering text again will update the issue description, uploading a file will add a screenshot, or clicking continue will let you submit this ticket.`,
         attachments: descriptionOptions
       }).route('improveDescription', { issue: state.issue });
     }
+
     slapp.route('submitIssue', (msg, state) => {
+      deleteExpiredButtons(msg);
+
       if (msg.type === 'action') {
         let answer = msg.body.actions[0].value;
 
@@ -160,12 +157,12 @@ module.exports = (slapp, script) => {
 
             msg.say('alright, screenshots erased. Let\'s try again');
             msg.say({
-              text: `${script.resubmitMessage}\n\n*Upload a jpg or png file to include it as a screenshot (hint: you can upload multiple if you\'d like)*`,
+              text: `${donedone.script.resubmitMessage}\n\n*Upload a jpg or png file to include it as a screenshot (hint: you can upload multiple if you\'d like)*`,
               attachments: descriptionOptions
             }).route('improveDescription', { issue: state.issue });
             break;
           case 'cancel':
-            response = script.cancelText;
+            response = donedone.script.cancelText;
 
             msg.respond(msg.body.response_url, {
               text: response,
@@ -186,7 +183,7 @@ module.exports = (slapp, script) => {
                 user_ids_to_cc: state.issue.user.id
               }
             }, (data) => {
-              msg.say(`${script.issueSubmitted}\n\nfollow ${donedone.slackChannelLink} to track bug # ${data.order_number}`);
+              msg.say(`${donedone.script.issueSubmitted}\n\nfollow ${donedone.slackChannelLink} to track bug # ${data.order_number}`);
             }, () => {
               msg.say('noooooo something broke!! Complain to Content Ops directly! We gotta fix this!')
             });
@@ -195,9 +192,15 @@ module.exports = (slapp, script) => {
         }
       } else {
         state.issue.description = msg.body.event.text;
-        msg.say(script.updatedDescription)
+        msg.say(donedone.script.updatedDescription)
           .route('submitIssue', { issue: state.issue })
       }
     });
   });
 };
+
+function deleteExpiredButtons(msg) {
+  msg.respond(msg.body.response_url, {
+    delete_original: true
+  });
+}

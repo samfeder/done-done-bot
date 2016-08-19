@@ -32,6 +32,16 @@ config:
   info: Used to inform Rosie where to create tickets
   type: text
   global: true
+- name: DONE_DONE_CHANNEL_ID
+  friendly_name: Slack Channel ID for Done Done
+  info: Slack Channel ID where Done Done integration is built in.
+  type: text
+  global: true
+- name: DONE_DONE_CHANNEL_NAME
+  friendly_name: Slack Channel Name for Done Done
+  info: Slack Channel name where Done Done integration is built in.
+  type: text
+  global: true
 - name: TRIAGE_ID
   friendly_name: Triage User ID in Done Done
   info: User who will re-assign issues
