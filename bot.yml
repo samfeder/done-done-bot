@@ -22,7 +22,7 @@ config:
   info: Rosie's full name in Done Done for assigning tickets
   type: text
   global: true
-- name: DONE_DONE_ID
+- name: DONE_DONE_ROSIE_ID
   friendly_name: User ID in Done Done for Rosie
   info: Used to assign rosie to tickets
   type: text
