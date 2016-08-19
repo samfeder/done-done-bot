@@ -1,4 +1,6 @@
-# done-done bot
+# Rosie
+
+![Rosie](https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2016-08-17/70404243008_de7f3ee5e681a6fbf25e_512.png)
 
 ## Workflow
 - Reporter opens done done bot in Slack
