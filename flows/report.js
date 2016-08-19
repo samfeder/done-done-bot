@@ -186,7 +186,7 @@ module.exports = (slapp, script) => {
                 user_ids_to_cc: state.issue.user.id
               }
             }, (data) => {
-              msg.say(script.issueSubmitted + '\nfollow #tissues4yourissues to track bug #' + data.order_number  );
+              msg.say(`${script.issueSubmitted}\n\nfollow ${donedone.slackChannelLink} to track bug # ${data.order_number}`);
             }, () => {
               msg.say('noooooo something broke!! Complain to Content Ops directly! We gotta fix this!')
             });
