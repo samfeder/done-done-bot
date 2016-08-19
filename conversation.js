@@ -76,7 +76,7 @@ module.exports.updatedDescription = [
 ];
 
 module.exports.invalidSubmission = [
-  'whoaaa, you need a description or a screenshot to move on hombre :mx:',
+  'whoaaa, you need a description or a screenshot to move on hombre :flag-mx:',
   'hey bud :frowning:, we need to talk... I need a longer description and/or a screenshot or we cannot proceed.',
   'love the enthusiasm, but I need a full description or a screenshot of the problem else we ain\'t reporting nothing',
   'NICE TRY! I need a description and/or a screenshot or you ain\'t goin\' nowhere.'

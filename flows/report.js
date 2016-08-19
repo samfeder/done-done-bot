@@ -1,7 +1,26 @@
 'use strict';
 const _ = require('lodash');
-const DONE_DONE_KEY = process.env.DONE_DONE_KEY;
-const DONE_DONE_USERNAME = process.env.DONE_DONE_USERNAME;
+const user = process.env.DONE_DONE_USERNAME;
+const password = process.env.DONE_DONE_PASSWORD;
+const rosie_name = process.env.DONE_DONE_FULL_NAME;
+const done_done_id = process.env.DONE_DONE_ID;
+
+const Client = require('node-rest-client').Client;
+const options_auth = { user, password };
+
+const client = new Client(options_auth);
+var urlBase = "https://amcsvod.mydonedone.com/issuetracker/api/v2";
+
+client.registerMethod("createIssue", `${urlBase}/projects/52172/issues.json`, "POST");
+client.registerMethod("getPeople", `${urlBase}/projects/52172/people.json`, "GET");
+const triageId = process.env.TRIAGE_ID;
+
+//Direct Slack Client
+const RtmClient = require('@slack/client').RtmClient;
+const token = process.env.SLACK_TOKEN || '';
+const rtm = new RtmClient(token, { logLevel: 'error' });
+
+rtm.start();
 
 const descriptionOptions = [{
   text: '',
@@ -25,20 +44,39 @@ const submittalOptions = [{
 module.exports = (slapp, script) => {
   slapp.message('(.*)', ['direct_message'], (msg, text) => {
     if (msg.type === 'file_share') return; //only respond to text
+    let doneDoneUser;
+    let currentUser = rtm.dataStore.getUserById(msg.meta.user_id);
 
-    msg.say({
-      text: `Issue: \`${text}\`\n${_.shuffle(script.initialReaction)[0]}`,
-      attachments: [{
-        text: '',
-        callback_id: 'report_issue_callback',
-        actions: [
-          { name: 'answer', text: 'Shudder', type: 'button', value: 'Shudder' },
-          { name: 'answer', text: 'SundanceNow', type: 'button', value: 'SundanceNow' },
-          { name: 'answer', text: 'Both Sites', type: 'button', value: 'Both Sites' },
-          { name: 'answer', text: 'Cancel / Start Over', type: 'button', value: 'cancel' }
-        ]
-      }]
-    }).route('handleIssue', { title: text });
+    client.methods.getPeople(function(data){
+      doneDoneUser = data.filter(function(user) {
+        return user.name === currentUser.real_name
+      })[0];
+
+      if (!doneDoneUser) {
+        //can't find via full name.
+        doneDoneUser = {
+          id: done_done_id,
+          name: rosie_name
+        };
+
+        msg.say('Well this is awkward :frown:... I can\'t find your done done account to CC you on this issue. We use the full names you signed up with on Slack and Done Done to match you! So please make sure those are identical :key:! That or go bother Sam F :smiley:')
+      }
+
+      
+      msg.say({
+        text: `Issue: \`${text}\`\n${_.shuffle(script.initialReaction)[0]}`,
+        attachments: [{
+          text: '',
+          callback_id: 'report_issue_callback',
+          actions: [
+            { name: 'answer', text: 'Shudder', type: 'button', value: 'Shudder' },
+            { name: 'answer', text: 'SundanceNow', type: 'button', value: 'SundanceNow' },
+            { name: 'answer', text: 'Both Sites', type: 'button', value: 'Both Sites' },
+            { name: 'answer', text: 'Cancel / Start Over', type: 'button', value: 'cancel' }
+          ]
+        }]
+      }).route('handleIssue', { title: text, user: doneDoneUser });
+    });
   });
 
   slapp.route('handleIssue', (msg, state) => {
@@ -94,9 +132,9 @@ module.exports = (slapp, script) => {
         if (state.issue.description || state.issue.screenshots && state.issue.screenshots.length > 0) {
           let response = _.shuffle(script.finalReview)[0];
           let title = `(${state.issue.site}) ${state.issue.title}`;
-          let screenshotText = state.issue.screenshots && state.issue.screenshots.join('\n');
-          let description = screenshotText
-            ? `${state.issue.description || ''} \n\nScreenshots:\n${screenshotText}`
+          state.issue.screenshotText = state.issue.screenshots && state.issue.screenshots.join('\n');
+          let description = state.issue.screenshotText
+            ? `${state.issue.description || ''} \n\nScreenshots:\n${state.issue.screenshotText}`
             : state.issue.description;
 
           msg.say({
@@ -161,8 +199,22 @@ module.exports = (slapp, script) => {
             return;
             break;
           default:
-            msg.say(_.shuffle(script.issueSubmitted)[0] + '\nfollow #tissues4yourissues to track your bug.');
-            //make API request
+            client.methods.createIssue({
+              headers: {"Content-Type": "application/json" },
+              data: {
+                title: `(${state.issue.site}) ${state.issue.title}`,
+                description: `${state.issue.description} \n\nScreenshots: ${state.issue.screenshotText}`,
+                attachments: state.issue.attachments,
+                priority_level_id: 1,
+                fixer_id: triageId,
+                tester_id: triageId,
+                user_ids_to_cc: state.issue.user.id
+              }
+            }, (data) => {
+              msg.say(_.shuffle(script.issueSubmitted)[0] + '\nfollow #tissues4yourissues to track your bug.');
+            }, error => {
+              msg.say('noooooo something broke!! Complain to Content Ops directly! We gotta fix this!')
+            });
             return;
             break;
         }

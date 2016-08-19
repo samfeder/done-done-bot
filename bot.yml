@@ -12,3 +12,23 @@ config:
   info: Done Done Username Associated to Rosie
   type: text
   global: true
+- name: DONE_DONE_PASSWORD
+  friendly_name: Done Done Password
+  info: Password to authenticate a Done Done user
+  type: secret
+  global: true
+- name: DONE_DONE_FULL_NAME
+  friendly_name: Done Done Full Name
+  info: Rosie's full name in Done Done for assigning tickets
+  type: text
+  global: true
+- name: DONE_DONE_ID
+  friendly_name: User ID in Done Done for Rosie
+  info: Used to assign rosie to tickets
+  type: text
+  global: true
+- name: TRIAGE_ID
+  friendly_name: Triage User ID in Done Done
+  info: User who will re-assign issues
+  type: text
+  global: true

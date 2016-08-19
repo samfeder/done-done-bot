@@ -12,6 +12,8 @@
     "slapp-convo-beepboop": "^1.0.0"
   },
   "dependencies": {
+    "@slack/client": "^3.5.4",
+    "node-rest-client": "^2.0.1",
     "slapp": "^1.0.2"
   }
 }
