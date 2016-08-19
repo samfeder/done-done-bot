@@ -27,6 +27,11 @@ config:
   info: Used to assign rosie to tickets
   type: text
   global: true
+- name: DONE_DONE_PROJECT_ID
+  friendly_name: Project ID in Done Done
+  info: Used to inform Rosie where to create tickets
+  type: text
+  global: true
 - name: TRIAGE_ID
   friendly_name: Triage User ID in Done Done
   info: User who will re-assign issues
