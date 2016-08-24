@@ -167,9 +167,10 @@ module.exports = slapp => {
             headers: { "Content-Type": "application/json" },
             data: {
               title: `(${state.issue.site}) ${state.issue.title}`,
-              description: `${state.issue.description} \n\nScreenshots: ${state.issue.screenshotText}\n\nReported By ${state.issue.user.name}`,
+              description: issueDescription(state.issue.description, state.issue.user.name, state.issue.screenshotText),
               attachments: state.issue.attachments,
               priority_level_id: 1,
+              tags: state.issue.site,
               fixer_id: triageId,
               tester_id: triageId,
               user_ids_to_cc: state.issue.user.id
@@ -191,6 +192,10 @@ module.exports = slapp => {
       prepForSubmission(state, msg);
     }
   });
+
+  function issueDescription(description, user, screenshotText = 'no screenshots provided') {
+    return `${description} \n\nScreenshots: ${screenshotText}\n\nReported By ${user}`;
+  }
 
   function handleImageUpload(state, msg) {
     let response;
