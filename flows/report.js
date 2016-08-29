@@ -193,8 +193,8 @@ module.exports = slapp => {
     }
   });
 
-  function issueDescription(description, user, screenshotText = 'no screenshots provided') {
-    return `${description} \n\nScreenshots: ${screenshotText}\n\nReported By ${user}`;
+  function issueDescription(description, user, screenshotText) {
+    return `${description}${screenshotText ? `\n\nScreenshots: ${screenshotText}` : ''}\n\nReported By ${user}`;
   }
 
   function handleImageUpload(state, msg) {
